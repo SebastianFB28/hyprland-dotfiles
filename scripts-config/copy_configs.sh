@@ -41,9 +41,6 @@ copy_app_config() {
     local mode="${3:-}"
     local app_name
     app_name="$(basename "$source_dir")"
-    # Todos los respaldos van centralizados aquí, nunca "al lado" del
-    # destino — si el destino es $HOME (como zsh), "${target_dir}-backup"
-    # quedaría en /home/, fuera del control del usuario.
     local backup_dir="$HOME/.hyprland-setup-backups/${app_name}-$(date +%Y%m%d-%H%M%S)"
     local backed_up=false
 
@@ -59,28 +56,33 @@ copy_app_config() {
 
     mkdir -p "$target_dir"
 
-    for file in "$source_dir"/*; do
-        # Saltar subcarpetas por ahora, solo copiamos archivos directos
-        [ -f "$file" ] || continue
-
-        local filename target
+    # Evaluamos explícitamente archivos visibles (*) y ocultos (.*)
+    for file in "$source_dir"/* "$source_dir"/.*; do
+        # Evitar los directorios especiales de navegación . y ..
+        local filename
         filename="$(basename "$file")"
-        target="$target_dir/$filename"
+        [ "$filename" = "." ] || [ "$filename" = ".." ] && continue
+        [ -e "$file" ] || continue
+
+        local target="$target_dir/$filename"
 
         if [ -e "$target" ]; then
-            if cmp -s "$file" "$target"; then
+            # Si es un archivo simple y es idéntico, omitimos la copia
+            if [ -f "$file" ] && [ -f "$target" ] && cmp -s "$file" "$target"; then
                 echo "  ✓ $filename (ya está al día)"
                 [ "$mode" = "exec" ] && chmod +x "$target"
                 continue
             fi
 
+            # Si es distinto, respaldamos
             mkdir -p "$backup_dir"
             mv "$target" "$backup_dir/$filename"
             backed_up=true
-            echo "  ⚠ $filename existía con contenido distinto — respaldado en $backup_dir"
+            echo "  ⚠ $filename respaldado en $backup_dir"
         fi
 
-        cp "$file" "$target"
+        # Copia recursiva (soporta tanto archivos como subcarpetas)
+        cp -r "$file" "$target"
 
         if [ "$mode" = "exec" ]; then
             chmod +x "$target"
