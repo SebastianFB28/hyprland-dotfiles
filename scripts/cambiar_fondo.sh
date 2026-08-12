@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Ruta de tus fondos Catppuccin
-WALLPAPER_DIR="/home/sebastianfb/Wallpaper/walls-catppuccin-mocha"
+WALLPAPER_DIR="$HOME/Wallpaper/walls-catppuccin-mocha"
 
 # Selecciona una imagen al azar
 RANDOM_WALLPAPER=$(find "$WALLPAPER_DIR" -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) | shuf -n 1)
