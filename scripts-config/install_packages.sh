@@ -46,6 +46,7 @@ AUR_PACKAGES=(
     wlogout                    # custom/power (menú de apagado) — solo está en AUR
     pokemon-colorscripts-git   # sprites de Pokémon al abrir terminal
     catppuccin-gtk-theme-frappe # tema GTK, incluye la variante yellow
+    sddm-astronaut-theme       # tema de login para sddm
 )
 
 TOTAL=$(( ${#PACKAGES[@]} + ${#AUR_PACKAGES[@]} ))
