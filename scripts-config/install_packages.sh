@@ -33,6 +33,9 @@ PACKAGES=(
     hyprpaper                 # backend alterno de fondo de pantalla
     awww                      # backend real que usa tu config.ini de waypaper
     nwg-look                  # ajustes GTK (temas, iconos, cursor, fuente)
+    qt6-svg           # requerido por temas SDDM en QML
+    qt6-declarative    # requerido por temas SDDM en QML
+    sddm               # display manager (pantalla de login)
 )
 
 # -----------------------------------------------------
@@ -220,4 +223,20 @@ if [ "$SHELL" != "$(command -v zsh)" ]; then
     fi
 else
     echo "✅ zsh ya es tu shell por defecto."
+fi
+
+# -----------------------------------------------------
+# Habilitar sddm como display manager
+# -----------------------------------------------------
+echo ""
+echo "==> Habilitando sddm..."
+if systemctl is-enabled --quiet sddm 2>/dev/null; then
+    echo "✅ sddm ya está habilitado."
+else
+    if sudo systemctl enable sddm > /tmp/enable_sddm.log 2>&1; then
+        echo "✅ sddm habilitado (aplica en el próximo arranque)."
+    else
+        echo "⚠️  No se pudo habilitar sddm automáticamente. Revisa /tmp/enable_sddm.log"
+        echo "    Corre manualmente: sudo systemctl enable sddm"
+    fi
 fi
